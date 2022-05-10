@@ -1,0 +1,1 @@
+org.junit.platform.console.ConsoleLauncher.main(args)

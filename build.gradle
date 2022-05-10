@@ -1,0 +1,59 @@
+plugins {
+    id 'groovy'
+}
+
+group 'comgithub.alopukhov.examples'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    groovyDistr {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+    sybok {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
+dependencies {
+    // this is the most simple way to get all dependencies
+    implementation platform('org.junit:junit-bom:5.8.2')
+    implementation 'org.codehaus.groovy:groovy:3.0.10'
+    implementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'junit:junit:4.13.2'
+    implementation 'org.junit.platform:junit-platform-suite-engine'
+    implementation 'org.spockframework:spock-core:2.1-groovy-3.0'
+    implementation 'org.junit.vintage:junit-vintage-engine'
+    implementation 'org.slf4j:slf4j-simple:1.7.36'
+    implementation 'org.testng:testng:7.5'
+    implementation 'org.junit.support:testng-engine:1.0.2'
+    implementation 'org.junit.platform:junit-platform-console'
+
+    groovyDistr group: 'org.codehaus.groovy', name: 'groovy-binary', version: '3.0.10', ext: 'zip'
+    sybok 'io.github.alopukhov.sybok:sybok-engine:0.3.0'
+}
+
+test {
+    useJUnitPlatform() {
+        includeTags 'example.PingCategory'
+    }
+}
+
+task setupWorkspace(type: Copy) {
+    into file("${project.rootDir}/workspace")
+    from zipTree(configurations.groovyDistr.resolve().find { true })
+    into('.') {
+        from file("${project.projectDir}/src/test/groovy")
+    }
+    into('libs') {
+        from configurations.runtimeClasspath
+    }
+    into('sybok-libs') {
+        from configurations.sybok
+    }
+}
